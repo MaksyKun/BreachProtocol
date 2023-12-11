@@ -1,17 +1,20 @@
 package device;
 
 import breach.BreachWindow;
+import decryptor.BreachDecryptor;
+import decryptor.BreachFile;
 
 import java.io.File;
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 public class DriverChecker {
-
-    private static final String MAIN_DRIVE = File.listRoots()[0].toString();
+    private static final List<String> blacklist = List.of("C:\\", "D:\\", "E:\\");
     private static final Map<File, Boolean> drivers = new TreeMap<>();
     private static final Map<File, BreachWindow> breaches = new TreeMap<>();
+    private static final Map<File, BreachFile> encryptions = new TreeMap<>();
 
     public static void driverUpdates() {
         Logger.getGlobal().info("Initializing driver update thread...");
@@ -19,12 +22,16 @@ public class DriverChecker {
             try {
                 while (true) {
                     for (File root : File.listRoots()) {
-                        if (root.toString().equals(MAIN_DRIVE) && !drivers.containsKey(root)) {
+                        if (blacklist.contains(root.toString()) && !drivers.containsKey(root)) {
                             drivers.put(root, true);
                         } else if (!drivers.containsKey(root) && !breaches.containsKey(root)) {
-                            drivers.put(root, false);
-                            System.out.println("The Driver " + root + " was inserted!");
-                            breaches.put(root, new BreachWindow(root));
+                            BreachFile encryption = BreachDecryptor.getEncryptionFile(root);
+                            if(encryption != null) {
+                                drivers.put(root, false);
+                                System.out.println("The Driver " + root + " was inserted!");
+                                breaches.put(root, new BreachWindow(root, encryption.getBreachAmount()));
+                                encryptions.put(root, encryption);
+                            }
                         }
                     }
                     Thread.sleep(100);
@@ -32,8 +39,12 @@ public class DriverChecker {
                     for (BreachWindow breach : breaches.values())
                         switch (breach.state) {
                             case RUNNING -> {
-                                if (!breach.isVisible())
+                                if (!breach.isVisible()) {
                                     breach.setVisible(true);
+                                    if(encryptions.containsKey(breach.driver)) {
+                                        BreachDecryptor.decrypt(breach);
+                                    }
+                                }
                             }
                             case FAILED -> {
                                 System.out.println("Access to " + breach.driver + " denied!");
