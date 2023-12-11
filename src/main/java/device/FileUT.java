@@ -1,6 +1,7 @@
 package device;
 
 import breach.BreachUT;
+import settings.SecurityProperties;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -15,7 +16,7 @@ public class FileUT {
     private final Map<File, String> passwords = new TreeMap<>();
 
     public static void lock(File driver) {
-        File zipFile = new File(driver, "___" + BreachUT.getRandomHexOrder(12) + ".zip");
+        File zipFile = new File(driver, "___" + BreachUT.getRandomHexOrder(SecurityProperties.encryptedFileLength) + ".zip");
         zip(driver, zipFile);
     }
 
@@ -24,13 +25,13 @@ public class FileUT {
         for (File file : driver.listFiles()) {
             if (file.getName().startsWith("___") && file.getName().endsWith(".zip") && !file.isHidden()) {
                 unzip(file, driver);
-                file.delete();
+                deleteFile(file);
             }
         }
     }
 
     public static void createEmptyZip(File driver) {
-        File file = new File(driver, "___" + BreachUT.getRandomHexOrder(BreachUT.random.nextInt(5, 10)) + ".zip");
+        File file = new File(driver, "___" + BreachUT.getRandomHexOrder(BreachUT.random.nextInt(SecurityProperties.minEncryptLength, SecurityProperties.maxEncryptLength)) + ".zip");
         try {
             if(!file.exists())
                 file.createNewFile();
@@ -56,10 +57,8 @@ public class FileUT {
             String fileName = file.getName();
             if(fileName.startsWith("___") && fileName.endsWith(".zip")) {
                 int size = fileName.replace("___", "").replace(".zip", "").split("-").length;
-                if(size <= 10) {
+                if(size < SecurityProperties.encryptedFileLength) {
                     deleteFile(file);
-                } else {
-                    System.out.println("Bypassed " + fileName);
                 }
             }
         }

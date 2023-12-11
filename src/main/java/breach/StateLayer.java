@@ -1,5 +1,7 @@
 package breach;
 
+import settings.Colors;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -39,6 +41,7 @@ public class StateLayer extends JPanel {
                 Thread.sleep(250);
                 label.setText("");
                 label.setText(text);
+                breach.animateClosing();
                 breach.dispose();
                 Thread.currentThread().interrupt();
             } catch (InterruptedException e) {
