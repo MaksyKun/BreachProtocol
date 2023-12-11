@@ -2,6 +2,7 @@ package breach;
 
 import lombok.Getter;
 import lombok.Setter;
+import settings.Colors;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -39,6 +40,7 @@ public class BreachEntry extends JButton {
     }
 
     private void initialize() {
+        setBorder(null);
         // Customize the appearance of the button
         //setPreferredSize(new Dimension(width, height));
         setText(hexCode);

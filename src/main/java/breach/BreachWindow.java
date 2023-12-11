@@ -1,6 +1,8 @@
 package breach;
 
 import device.FileUT;
+import settings.Colors;
+import settings.SecurityProperties;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -19,6 +21,8 @@ public class BreachWindow extends JFrame {
 
     // File/Folder that'll be encrypted through breach
     public final File driver;
+    public final int level;
+    public int solveAmount = 0;
     private Thread cryptoThread;
 
     // Active assets for breaching
@@ -30,16 +34,22 @@ public class BreachWindow extends JFrame {
     public BreachEntry[][] breachEntries;
     public Integer[][] usedPositions = new Integer[6][6];
 
+    // TODO secure with encryption (rsa?)
+    public List<Integer[]> master = new ArrayList<>();
+
     // Solution and resolved-state of the breach
     public List<String> solution;
     public List<String> resolved = new ArrayList<>();
 
-    public BreachWindow(File driver) {
+    public BreachWindow(File driver, int level) {
         this.instance = this;
         this.driver = driver;
+        this.level = level;
+
         if (driver.toString().equals("C:\\")) return;
         cryptoThread = runCrypto();
         setTitle("Breach Protocol");
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon.png")));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(480, 540));
@@ -47,23 +57,7 @@ public class BreachWindow extends JFrame {
         setResizable(false);
         getContentPane().setBackground(Colors.MAIN_BACKGROUND);
 
-        stateLayer = new StateLayer();
-        stateLayer.setPreferredSize(new Dimension(480, 60));
-
-        JPanel breachMatrix = new JPanel(new GridLayout(6, 6));
-        breachMatrix.setPreferredSize(new Dimension(480, 480));
-        breachEntries = BreachUT.getHexMatrix(this);
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
-                breachMatrix.add(breachEntries[i][j]);
-            }
-        }
-
-        solution = generateSolution(breachEntries, 5);
-        setTitle(getTitle() + ": " + solution);
-
-        add(stateLayer, BorderLayout.NORTH);
-        add(breachMatrix, BorderLayout.CENTER);
+        continueBreach();
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -77,6 +71,34 @@ public class BreachWindow extends JFrame {
         });
         setAlwaysOnTop(true);
         setLocationRelativeTo(null);
+
+    }
+
+    public void continueBreach() {
+        getContentPane().removeAll();
+        breachEntries = BreachUT.getHexMatrix(this);
+        usedPositions = new Integer[6][6];
+        master = new ArrayList<>();
+
+        stateLayer = new StateLayer();
+        stateLayer.setPreferredSize(new Dimension(480, 60));
+
+        JPanel breachMatrix = new JPanel(new GridLayout(6, 6));
+        breachMatrix.setPreferredSize(new Dimension(480, 480));
+        breachMatrix.setBackground(Colors.MAIN_BACKGROUND);
+        breachEntries = BreachUT.getHexMatrix(this);
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                breachMatrix.add(breachEntries[i][j]);
+            }
+        }
+
+        solution = generateSolution(breachEntries, BreachUT.random.nextInt(SecurityProperties.minPuffer, SecurityProperties.maxPuffer));
+        resolved.clear();
+        setTitle("Breach Protocol: " + solution);
+
+        add(stateLayer, BorderLayout.NORTH);
+        add(breachMatrix, BorderLayout.CENTER);
     }
 
     private List<String> generateSolution(BreachEntry[][] entries, int size) {
@@ -105,6 +127,7 @@ public class BreachWindow extends JFrame {
                 usedPositions[lastRow][lastCol] = 1;
             }
             horizontal = solution.size() % 2 == 0;
+            master.add(new Integer[]{lastRow, lastCol});
         }
         return solution;
     }
@@ -118,13 +141,7 @@ public class BreachWindow extends JFrame {
             stateLayer.update(instance);
             return;
         }
-        this.currentRow = row;
-        this.currentCol = col;
-        usedPositions[currentRow][currentCol] = 1;
-        entry.setBackground(Colors.BREACH_STANDARD);
-        entry.setBorder(new LineBorder(Colors.MAIN_FONT, 4));
-        resolved.add(entry.getHexCode());
-        entry.setTriggered(true);
+        triggerEntry(row, col);
 
         if (resolved.size() % 2 == 0) {
             changeHorizontalBackground(currentRow);
@@ -133,11 +150,27 @@ public class BreachWindow extends JFrame {
         }
 
         if (solution.size() == resolved.size()) {
-            state = BreachState.SUCCESS;
-            stateLayer.update(this);
-            //dispose();
-            cryptoThread.interrupt();
+            solveAmount++;
+            if(solveAmount == level) {
+                state = BreachState.SUCCESS;
+                stateLayer.update(this);
+                try {
+                    cryptoThread.join();
+                } catch (InterruptedException e) {}
+            } else {
+                continueBreach();
+            }
         }
+    }
+
+    public void triggerEntry(int row, int col) {
+        this.currentRow = row;
+        this.currentCol = col;
+        usedPositions[row][col] = 1;
+        breachEntries[row][col].setBackground(Colors.BREACH_STANDARD);
+        breachEntries[row][col].setBorder(new LineBorder(Colors.MAIN_FONT, 4));
+        resolved.add(breachEntries[row][col].getHexCode());
+        breachEntries[row][col].setTriggered(true);
     }
 
     public void changeHorizontalBackground(int row) {
@@ -190,6 +223,7 @@ public class BreachWindow extends JFrame {
                 } catch (Exception e) {
                     e.printStackTrace();
                     state = BreachState.FAILED;
+                    stateLayer.update(this);
                 }
             }
         });
@@ -208,9 +242,28 @@ public class BreachWindow extends JFrame {
         FileUT.deleteEmptyZip(driver);
     }
 
+    public void animateClosing() {
+
+        if(state == null) return;
+        try {
+            Color color = state == BreachState.SUCCESS ? Colors.SUCCESS_BACKGROUND : Colors.FAILED_BACKGROUND;
+            stateLayer.setBorder(null);
+            for(int i = 0; i < 6; i++) {
+                for(int j = 0; j < 6; j++) {
+                    breachEntries[i][j].setBackground(color);
+                    breachEntries[i][j].setText(" ");
+                    breachEntries[i][j].setBorder(null);
+                }
+                Thread.sleep(25);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     public enum BreachState {
         RUNNING,
         FAILED,
-        SUCCESS;
+        SUCCESS
     }
 }
