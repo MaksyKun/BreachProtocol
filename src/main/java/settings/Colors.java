@@ -1,4 +1,4 @@
-package breach;
+package settings;
 
 import java.awt.*;
 
