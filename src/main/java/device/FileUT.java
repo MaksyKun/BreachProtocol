@@ -13,6 +13,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class FileUT {
+    /*
     private final Map<File, String> passwords = new TreeMap<>();
 
     public static void lock(File driver) {
@@ -143,5 +144,5 @@ public class FileUT {
             }
         } catch (IOException ignored) {
         }
-    }
+    }*/
 }

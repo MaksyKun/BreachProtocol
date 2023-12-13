@@ -1,5 +1,7 @@
 package breach;
 
+import settings.SecurityProperties;
+
 import java.util.List;
 import java.util.Random;
 
@@ -9,9 +11,9 @@ public class BreachUT {
     public static final Random random = new Random();
 
     public static BreachEntry[][] getHexMatrix(BreachWindow breach) {
-        BreachEntry[][] entries = new BreachEntry[6][6];
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
+        BreachEntry[][] entries = new BreachEntry[SecurityProperties.breachSize][SecurityProperties.breachSize];
+        for (int i = 0; i < SecurityProperties.breachSize; i++) {
+            for (int j = 0; j < SecurityProperties.breachSize; j++) {
                 entries[i][j] = new BreachEntry(breach, hexCodes.get(random.nextInt(0, hexCodes.size() - 1)), i, j);
             }
         }

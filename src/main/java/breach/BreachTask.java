@@ -1,6 +1,6 @@
 package breach;
 
-import static breach.BreachTask.BreachState.*;
+import static breach.BreachTask.BreachState.RUNNING;
 
 @SuppressWarnings("unused")
 public class BreachTask {
@@ -84,18 +84,10 @@ public class BreachTask {
     public BreachWindow window() {
         return breachWindow;
     }
+
     public void run() {
         if (event == null) {
             throw new RuntimeException("BreachEvent cannot be null");
-        }
-        if (runnable == null) {
-            throw new RuntimeException("Running Task cannot be null");
-        }
-        if (successCallback == null) {
-            throw new RuntimeException("Success Task cannot be null");
-        }
-        if (failedCallback == null) {
-            throw new RuntimeException("Failed Task cannot be null");
         }
         if (!breachWindow.isVisible())
             breachWindow.setVisible(true);
@@ -108,8 +100,10 @@ public class BreachTask {
 
                     switch (state) {
                         case RUNNING -> {
-                            runnable.run();
-                            event.onBreachRunning(this);
+                            event.onBreachPreRunning(this);
+                            if (runnable != null)
+                                runnable.run();
+                            event.onBreachPostRunning(this);
                             if (!Thread.currentThread().isInterrupted())
                                 Thread.sleep(1000);
                         }

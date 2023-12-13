@@ -20,7 +20,7 @@ public class BreachWindow extends JFrame {
     private int currentRow = 0;
     private int currentCol = 0;
     private BreachEntry[][] breachEntries;
-    private Integer[][] usedPositions = new Integer[6][6];
+    private Integer[][] usedPositions = new Integer[SecurityProperties.breachSize][SecurityProperties.breachSize];
 
     // Solution and resolved-state of the breach
     private final List<String> solution = new ArrayList<>();
@@ -44,14 +44,16 @@ public class BreachWindow extends JFrame {
             public void windowClosed(WindowEvent e) {
                 switch (task.state()) {
                     case SUCCESS -> {
-                        task.getSuccessCallback().run();
                         task.event().onBreachSuccess(task);
+                        if (task.getSuccessCallback() != null)
+                            task.getSuccessCallback().run();
                     }
                     case FAILED, RUNNING -> {
                         if (task.state() == BreachTask.BreachState.RUNNING)
                             task.setState(BreachTask.BreachState.FAILED);
-                        task.getFailedCallback().run();
                         task.event().onBreachFailed(task);
+                        if (task.getFailedCallback() != null)
+                            task.getFailedCallback().run();
                     }
                 }
                 super.windowClosed(e);
@@ -72,18 +74,18 @@ public class BreachWindow extends JFrame {
     public void continueBreach() {
         getContentPane().removeAll();
         breachEntries = BreachUT.getHexMatrix(this);
-        usedPositions = new Integer[6][6];
+        usedPositions = new Integer[SecurityProperties.breachSize][SecurityProperties.breachSize];
         master = new ArrayList<>();
 
         stateLayer = new StateLayer();
         stateLayer.setPreferredSize(new Dimension(480, 60));
 
-        JPanel breachMatrix = new JPanel(new GridLayout(6, 6));
+        JPanel breachMatrix = new JPanel(new GridLayout(SecurityProperties.breachSize, SecurityProperties.breachSize));
         breachMatrix.setPreferredSize(new Dimension(480, 480));
         breachMatrix.setBackground(Colors.MAIN_BACKGROUND);
         breachEntries = BreachUT.getHexMatrix(this);
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
+        for (int i = 0; i < SecurityProperties.breachSize; i++) {
+            for (int j = 0; j < SecurityProperties.breachSize; j++) {
                 breachMatrix.add(breachEntries[i][j]);
             }
         }
@@ -99,7 +101,7 @@ public class BreachWindow extends JFrame {
 
     private List<String> generateSolution(BreachEntry[][] entries, int size) {
         List<String> solution = new ArrayList<>();
-        Integer[][] usedPositions = new Integer[6][6];
+        Integer[][] usedPositions = new Integer[SecurityProperties.breachSize][SecurityProperties.breachSize];
         int lastRow = 0;
         int lastCol = -1;
 
@@ -108,14 +110,14 @@ public class BreachWindow extends JFrame {
         Random rand = new Random();
         while (solution.size() < size) {
             if (lastCol == -1) {
-                lastCol = rand.nextInt(0, 5);
+                lastCol = rand.nextInt(0, SecurityProperties.breachSize - 1);
                 solution.add(entries[lastRow][lastCol].getHexCode());
                 usedPositions[lastRow][lastCol] = 1;
             } else {
                 if (horizontal)
-                    lastCol = rand.nextInt(0, 5);
+                    lastCol = rand.nextInt(0, SecurityProperties.breachSize - 1);
                 else
-                    lastRow = rand.nextInt(0, 5);
+                    lastRow = rand.nextInt(0, SecurityProperties.breachSize - 1);
 
                 if (usedPositions[lastRow][lastCol] != null)
                     continue;
@@ -166,8 +168,8 @@ public class BreachWindow extends JFrame {
     }
 
     public void changeHorizontalBackground(int row) {
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
+        for (int i = 0; i < SecurityProperties.breachSize; i++) {
+            for (int j = 0; j < SecurityProperties.breachSize; j++) {
                 if (i == row) {
                     breachEntries[i][j].setBackground(Colors.BREACH_HOVER);
                     breachEntries[i][j].setCanHover(true);
@@ -180,8 +182,8 @@ public class BreachWindow extends JFrame {
     }
 
     public void changeVerticalBackground(int col) {
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
+        for (int i = 0; i < SecurityProperties.breachSize; i++) {
+            for (int j = 0; j < SecurityProperties.breachSize; j++) {
                 if (j == col) {
                     breachEntries[i][j].setBackground(Colors.BREACH_HOVER);
                 } else {
@@ -196,8 +198,8 @@ public class BreachWindow extends JFrame {
         try {
             Color color = task.state() == BreachTask.BreachState.SUCCESS ? Colors.SUCCESS_BACKGROUND : Colors.FAILED_BACKGROUND;
             stateLayer.setBorder(null);
-            for (int i = 0; i < 6; i++) {
-                for (int j = 0; j < 6; j++) {
+            for (int i = 0; i < SecurityProperties.breachSize; i++) {
+                for (int j = 0; j < SecurityProperties.breachSize; j++) {
                     breachEntries[i][j].setBackground(color);
                     breachEntries[i][j].setText(" ");
                     breachEntries[i][j].setBorder(null);
