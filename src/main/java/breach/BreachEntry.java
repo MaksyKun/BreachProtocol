@@ -41,8 +41,6 @@ public class BreachEntry extends JButton {
 
     private void initialize() {
         setBorder(null);
-        // Customize the appearance of the button
-        //setPreferredSize(new Dimension(width, height));
         setText(hexCode);
         setFont(new Font("Agency", Font.BOLD, 18));
         setForeground(Colors.MAIN_FONT);
@@ -53,7 +51,7 @@ public class BreachEntry extends JButton {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if(!triggered)
-                    breach.updateCurrentClick(entry);
+                    breach.updateCurrentClick(row, col);
                 super.mouseClicked(e);
             }
 
@@ -81,14 +79,3 @@ public class BreachEntry extends JButton {
         setFocusPainted(false);
     }
 }
-
-
-/*
-Border outerBorder = new LineBorder(Color.BLUE, 2);
-                Border innerBorder = new LineBorder(Color.RED, 1);
-                Border spaceBorder = new EmptyBorder(1 + 2, 1 + 2, 1, 1);
-
-                // Combine the outer, space, and inner borders
-                Border compoundBorder = new CompoundBorder(outerBorder, spaceBorder);
-                compoundBorder = new CompoundBorder(compoundBorder, innerBorder);
- */

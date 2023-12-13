@@ -1,19 +1,10 @@
 package device;
 
-import breach.BreachWindow;
-import decryptor.BreachDecryptor;
-import decryptor.BreachFile;
-
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.logging.Logger;
-
 public class DriverChecker {
+    /*
     private static final List<String> blacklist = List.of("C:\\", "D:\\", "E:\\");
     private static final Map<File, Boolean> drivers = new TreeMap<>();
-    private static final Map<File, BreachWindow> breaches = new TreeMap<>();
+    private static final Map<File, BreachWindowOld> breaches = new TreeMap<>();
     private static final Map<File, BreachFile> encryptions = new TreeMap<>();
 
     public static void driverUpdates() {
@@ -29,14 +20,14 @@ public class DriverChecker {
                             if(encryption != null) {
                                 drivers.put(root, false);
                                 System.out.println("The Driver " + root + " was inserted!");
-                                breaches.put(root, new BreachWindow(root, encryption.getBreachAmount()));
+                                breaches.put(root, new BreachWindowOld(root, encryption.getBreachAmount()));
                                 encryptions.put(root, encryption);
                             }
                         }
                     }
                     Thread.sleep(100);
 
-                    for (BreachWindow breach : breaches.values())
+                    for (BreachWindowOld breach : breaches.values())
                         switch (breach.state) {
                             case RUNNING -> {
                                 if (!breach.isVisible()) {
@@ -68,5 +59,5 @@ public class DriverChecker {
             }
         });
         thread.start();
-    }
+    }*/
 }

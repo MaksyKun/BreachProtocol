@@ -1,6 +1,5 @@
 package breach;
 
-import device.FileUT;
 import settings.Colors;
 import settings.SecurityProperties;
 
@@ -9,45 +8,29 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class BreachWindow extends JFrame {
 
-    private final BreachWindow instance;
+    private final BreachTask task;
 
-    // File/Folder that'll be encrypted through breach
-    public final File driver;
-    public final int level;
-    public int solveAmount = 0;
-    private Thread cryptoThread;
-
-    // Active assets for breaching
-    public BreachState state = BreachState.RUNNING;
-    public StateLayer stateLayer;
-
-    public int currentRow = 0;
-    public int currentCol = 0;
-    public BreachEntry[][] breachEntries;
-    public Integer[][] usedPositions = new Integer[6][6];
-
-    // TODO secure with encryption (rsa?)
-    public List<Integer[]> master = new ArrayList<>();
+    private StateLayer stateLayer;
+    private int currentRow = 0;
+    private int currentCol = 0;
+    private BreachEntry[][] breachEntries;
+    private Integer[][] usedPositions = new Integer[6][6];
 
     // Solution and resolved-state of the breach
-    public List<String> solution;
-    public List<String> resolved = new ArrayList<>();
+    private final List<String> solution = new ArrayList<>();
+    private final List<String> resolved = new ArrayList<>();
 
-    public BreachWindow(File driver, int level) {
-        this.instance = this;
-        this.driver = driver;
-        this.level = level;
+    // TODO secure with encryption (rsa?)
+    private List<Integer[]> master = new ArrayList<>();
 
-        if (driver.toString().equals("C:\\")) return;
-        cryptoThread = runCrypto();
+    public BreachWindow(BreachTask task) {
+        this.task = task;
         setTitle("Breach Protocol");
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon.png")));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -56,22 +39,34 @@ public class BreachWindow extends JFrame {
         setMinimumSize(new Dimension(480, 540));
         setResizable(false);
         getContentPane().setBackground(Colors.MAIN_BACKGROUND);
-
-        continueBreach();
-
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                if (state != BreachState.SUCCESS) {
-                    state = BreachState.FAILED;
-                    stateLayer.update(instance);
+                switch (task.state()) {
+                    case SUCCESS -> {
+                        task.getSuccessCallback().run();
+                        task.event().onBreachSuccess(task);
+                    }
+                    case FAILED, RUNNING -> {
+                        if (task.state() == BreachTask.BreachState.RUNNING)
+                            task.setState(BreachTask.BreachState.FAILED);
+                        task.getFailedCallback().run();
+                        task.event().onBreachFailed(task);
+                    }
                 }
                 super.windowClosed(e);
             }
         });
         setAlwaysOnTop(true);
         setLocationRelativeTo(null);
+    }
 
+    public StateLayer stateLayer() {
+        return stateLayer;
+    }
+
+    public List<Integer[]> master() {
+        return master;
     }
 
     public void continueBreach() {
@@ -93,7 +88,8 @@ public class BreachWindow extends JFrame {
             }
         }
 
-        solution = generateSolution(breachEntries, BreachUT.random.nextInt(SecurityProperties.minPuffer, SecurityProperties.maxPuffer));
+        solution.clear();
+        solution.addAll(generateSolution(breachEntries, BreachUT.random.nextInt(SecurityProperties.minPuffer, SecurityProperties.maxPuffer)));
         resolved.clear();
         setTitle("Breach Protocol: " + solution);
 
@@ -132,13 +128,12 @@ public class BreachWindow extends JFrame {
         return solution;
     }
 
-    public void updateCurrentClick(BreachEntry entry) {
-        int row = entry.getRow();
-        int col = entry.getCol();
+    public void updateCurrentClick(int row, int col) {
+        BreachEntry entry = breachEntries[row][col];
         if (usedPositions[row][col] != null) return;
         if (!solution.get(resolved.size()).equals(entry.getHexCode())) {
-            state = BreachState.FAILED;
-            stateLayer.update(instance);
+            task.setState(BreachTask.BreachState.FAILED);
+            stateLayer.update(task);
             return;
         }
         triggerEntry(row, col);
@@ -150,13 +145,10 @@ public class BreachWindow extends JFrame {
         }
 
         if (solution.size() == resolved.size()) {
-            solveAmount++;
-            if(solveAmount == level) {
-                state = BreachState.SUCCESS;
-                stateLayer.update(this);
-                try {
-                    cryptoThread.join();
-                } catch (InterruptedException e) {}
+            task.incrementBreach();
+            if (task.solveAmount() == task.level()) {
+                task.setState(BreachTask.BreachState.SUCCESS);
+                stateLayer.update(task);
             } else {
                 continueBreach();
             }
@@ -199,57 +191,13 @@ public class BreachWindow extends JFrame {
         }
     }
 
-    private Thread runCrypto() {
-        FileUT.lock(driver);
-        Thread thread = new Thread(() -> {
-            while (true) {
-                try {
-                    if (Thread.currentThread().isInterrupted() || state != BreachState.RUNNING) {
-                        decryptDriver();
-                        if (state == BreachState.SUCCESS) {
-                            try {
-                                Desktop.getDesktop().open(driver);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        break;
-                    } else {
-                        decryptDriver();
-                        encryptDriver();
-                        if (!Thread.currentThread().isInterrupted())
-                            Thread.sleep(1000);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    state = BreachState.FAILED;
-                    stateLayer.update(this);
-                }
-            }
-        });
-        thread.start();
-        return thread;
-    }
-
-    private void encryptDriver() {
-        if (driver.listFiles().length > 250) return;
-        for (int i = 0; i < 250; i++) {
-            FileUT.createEmptyZip(driver);
-        }
-    }
-
-    private void decryptDriver() {
-        FileUT.deleteEmptyZip(driver);
-    }
-
     public void animateClosing() {
-
-        if(state == null) return;
+        if (task.state() == BreachTask.BreachState.RUNNING) return;
         try {
-            Color color = state == BreachState.SUCCESS ? Colors.SUCCESS_BACKGROUND : Colors.FAILED_BACKGROUND;
+            Color color = task.state() == BreachTask.BreachState.SUCCESS ? Colors.SUCCESS_BACKGROUND : Colors.FAILED_BACKGROUND;
             stateLayer.setBorder(null);
-            for(int i = 0; i < 6; i++) {
-                for(int j = 0; j < 6; j++) {
+            for (int i = 0; i < 6; i++) {
+                for (int j = 0; j < 6; j++) {
                     breachEntries[i][j].setBackground(color);
                     breachEntries[i][j].setText(" ");
                     breachEntries[i][j].setBorder(null);
@@ -259,11 +207,5 @@ public class BreachWindow extends JFrame {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    public enum BreachState {
-        RUNNING,
-        FAILED,
-        SUCCESS
     }
 }

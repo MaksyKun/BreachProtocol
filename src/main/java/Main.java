@@ -1,19 +1,35 @@
-import breach.BreachUT;
-import decryptor.BreachFile;
-import device.DriverChecker;
+import breach.*;
+import decryptor.BreachDecryptor;
 import settings.SecurityProperties;
-
-import java.net.URL;
 
 public class Main {
 
     public static void main(String[] args) {
         SecurityProperties.checkProperties();
-        new BreachFile(BreachUT.random.nextInt(50, 250), 30, true).generate();
-        DriverChecker.driverUpdates();
-    }
+        //DriverChecker.driverUpdates();
 
-    public static URL getIcon() {
-        return Main.class.getResource("resources/icon.png");
+        BreachTask breach = new BreachTask(100);
+        breach.createEvent(new BreachEvent() {
+            @Override
+            public void onBreachRunning(BreachTask breach) {
+                System.out.println("Test");
+            }
+
+            @Override
+            public void onBreachSuccess(BreachTask breach) {
+                System.out.println("Test Success");
+            }
+
+            @Override
+            public void onBreachFailed(BreachTask breach) {
+                System.out.println("Test Failed");
+            }
+        });
+
+        breach.setRunnable(() -> {});
+        breach.setSuccessCallback(() -> {});
+        breach.setFailedCallback(() -> {});
+        breach.run();
+        BreachDecryptor.decrypt(breach);
     }
 }
