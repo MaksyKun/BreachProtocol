@@ -29,6 +29,7 @@ public static void main(String args[]) {
       // Code that is being executed when the breach was failed to solve
   });
 
+  // Start the breach
   breach.run();
 }
 ```
