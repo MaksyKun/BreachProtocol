@@ -4,5 +4,5 @@ be used in any type of java-applications. Since I lack on some knowledge about g
 However, once everything is working properly, Ill think about doing one.
 
 Feel free to contribute to work together on a completely fictional & hopefully fun project.
-
+If you're interested to hear about my approach of this project, DM me under Discord: maksykun
 
