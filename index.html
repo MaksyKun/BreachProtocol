@@ -2,9 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>BreachProtocol API</title>
+    <link rel="stylesheet" href="css.css">
 </head>
 <body>
+    <div id="sidebar">
+        <a href="https://maksykun.github.io/BreachProtocol/">Using the API</a>
+        <a href="https://maksykun.github.io/BreachProtocol/">Using a BreachTask</a>
+        <a href="https://maksykun.github.io/BreachProtocol/">BreachTask Events</a>
+    </div>
+    <div id="content">
+        <h2>Using the API</h2>
+        <p>Make sure to add the BreachProtocol-API as a dependency into your project</p>
+        <pre>
+            <code>&ltdependency&gt<br>   &ltgroupId&gtnet.maksy&ltgroupId&gt<br>   &ltartifactId&gtBreachProtocol&ltartifactId&gt<br>   &ltversion&gt0.0.0.1&ltversion&gt<br>&lt/dependency&gt</code>
+            <button class="copy-code-button">Copy</button></pre>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/prism.js"></script>
+    <script>
+        // Add click event listener to each copy code button
+        document.querySelectorAll(".copy-code-button").forEach(function(button) {
+            button.addEventListener("click", function() {
+                // Get the code element
+                var codeElement = this.parentElement.querySelector("code");
 
+                // Create a temporary textarea to copy the code
+                var textarea = document.createElement("textarea");
+                textarea.value = codeElement.innerText;
+                document.body.appendChild(textarea);
+
+                // Select and copy the code
+                textarea.select();
+                document.execCommand("copy");
+
+                // Remove the temporary textarea
+                document.body.removeChild(textarea);
+
+                // Change the button text to "Copied!" for a short duration
+                var originalText = this.innerText;
+                this.innerText = "Copied!";
+                setTimeout(function() {
+                    button.innerText = originalText;
+                }, 1500);
+            });
+        });
+    </script>
 </body>
 </html>
