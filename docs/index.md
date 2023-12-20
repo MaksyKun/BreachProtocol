@@ -1,6 +1,7 @@
 ---
 title: Home
 layout: default
+footer_text: "Test text"
 ---
 [![Build Status](https://travis-ci.org/pages-themes/minimal.svg?branch=master)](https://travis-ci.org/pages-themes/minimal)
 # BreachProtocol
