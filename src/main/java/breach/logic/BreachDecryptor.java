@@ -1,6 +1,4 @@
-package decryptor;
-
-import breach.BreachTask;
+package breach.logic;
 
 public class BreachDecryptor {
 

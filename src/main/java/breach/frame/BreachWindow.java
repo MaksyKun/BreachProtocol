@@ -1,5 +1,6 @@
-package breach;
+package breach.frame;
 
+import breach.logic.BreachTask;
 import settings.Colors;
 import settings.SecurityProperties;
 

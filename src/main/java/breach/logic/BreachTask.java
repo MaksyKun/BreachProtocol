@@ -1,6 +1,8 @@
-package breach;
+package breach.logic;
 
-import static breach.BreachTask.BreachState.RUNNING;
+import breach.frame.BreachWindow;
+
+import static breach.logic.BreachTask.BreachState.RUNNING;
 
 @SuppressWarnings("unused")
 public class BreachTask {

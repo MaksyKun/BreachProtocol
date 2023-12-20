@@ -1,4 +1,4 @@
-import breach.BreachTask;
+import breach.logic.BreachTask;
 import settings.SecurityProperties;
 
 public class BreachApi {

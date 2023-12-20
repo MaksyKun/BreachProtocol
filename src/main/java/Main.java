@@ -1,6 +1,6 @@
-import breach.BreachEvent;
-import breach.BreachTask;
-import decryptor.BreachDecryptor;
+import breach.logic.BreachEvent;
+import breach.logic.BreachTask;
+import breach.logic.BreachDecryptor;
 import settings.SecurityProperties;
 
 public class Main {
@@ -14,7 +14,7 @@ public class Main {
 
         //DriverChecker.driverUpdates();
 
-        BreachTask breach = new BreachTask(50);
+        BreachTask breach = new BreachTask(100);
         breach.createEvent(new BreachEvent() {
             @Override
             public void onBreachPreRunning(BreachTask breach) {
@@ -29,7 +29,6 @@ public class Main {
             @Override
             public void onBreachSuccess(BreachTask breach) {
                 System.out.println("Test Success");
-
             }
 
             @Override
@@ -37,6 +36,17 @@ public class Main {
                 System.out.println("Test Failed");
             }
         });
+
+        breach.setRunnable(() -> {
+            // Code that is being executed while the breach is active / not solved
+        });
+        breach.setFailedCallback(() -> {
+            // Code that is being executed when the breach is successfully solved
+        });
+        breach.setRunnable(() -> {
+            // Code that is being executed when the breach was failed to solve
+        });
+
         breach.run();
         BreachDecryptor.decrypt(breach);
     }
