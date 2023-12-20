@@ -1,39 +1,27 @@
-// Get the <pre> element
-const preTag = document.getElementById("code");
-const copyButton = document.createElement("code");
-// Create a copy button element
-copyButton.innerText = "Copy";
-copyButton.classList.add("copy-button");
-// Append the copy button to the <pre> tag
-preTag.appendChild(copyButton);
+import "https://cdn.jsdelivr.net/npm/prismjs@1.27.0/prism.js";
+// Add click event listener to each copy code button
+document.querySelectorAll(".copy-code-button").forEach(function(button) {
+    button.addEventListener("click", function() {
+        // Get the code element
+        const codeElement = this.parentElement.querySelector("code");
 
-// Add click event listener to the copy button
-copyButton.addEventListener("click", () => {
-    // Hide the copy button temporarily
-    copyButton.style.display = "none";
+        // Create a temporary textarea to copy the code
+        const textarea = document.createElement("textarea");
+        textarea.value = codeElement.innerText;
+        document.body.appendChild(textarea);
 
-    // Create a range and select the text inside the <pre> tag
-    const range = document.createRange();
-    range.selectNode(preTag);
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
-
-    try {
-        // Copy the selected text to the clipboard
+        // Select and copy the code
+        textarea.select();
         document.execCommand("copy");
 
-        // Alert the user that the text has been copied
-        copyButton.innerText = "Copied!";
-        setTimeout(function(){
-            copyButton.innerText = "Copy";
-        }, 2000);
-    } catch (err) {
-        console.error("Unable to copy text:", err);
-    } finally {
-        // Show the copy button again
-        copyButton.style.display = "inline";
+        // Remove the temporary textarea
+        document.body.removeChild(textarea);
 
-        // Deselect the text
-        window.getSelection().removeAllRanges();
-    }
+        // Change the button text to "Copied!" for a short duration
+        var originalText = this.innerText;
+        this.innerText = "Copied!";
+        setTimeout(function() {
+            button.innerText = originalText;
+        }, 1500);
+    });
 });
