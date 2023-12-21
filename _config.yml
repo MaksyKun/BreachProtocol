@@ -1,4 +1,5 @@
 sidebar:
+  - home
   - label: Getting Started
     children:
-      - index.md
+      - breach-event
