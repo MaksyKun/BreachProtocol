@@ -1,9 +1,12 @@
 ---
 title: Home
 layout: default
-footer_text: "Test text"
 ---
+
 [![Build Status](https://travis-ci.org/pages-themes/minimal.svg?branch=master)](https://travis-ci.org/pages-themes/minimal)
+
+<img src="img/logo.png" alt="Cyberpunk Breach Protocoll">
+
 # BreachProtocol
 BreachProtcol is an API to reconstruct breach puzzles that are based on Cyberpunk 2077.
 The API allows you to place a breach-window based on JFrame between two transactions
@@ -22,6 +25,3 @@ If you're interested to hear about my approach of this project, DM me under Disc
 ## Further Documentation
 If you'd like to see the progress of this api you will be most-likely able to do it through the
 documentation. The sidebar shows a slightly overview of the functionality yet.
-
-
-[Widget](_Sidebar.md)
