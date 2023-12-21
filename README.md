@@ -1,8 +1,3 @@
----
-title: Home
-layout: default
----
-
 [![Build Status](https://travis-ci.org/pages-themes/minimal.svg?branch=master)](https://travis-ci.org/pages-themes/minimal)
 
 <img src="img/logo.png" alt="Cyberpunk Breach Protocoll">
