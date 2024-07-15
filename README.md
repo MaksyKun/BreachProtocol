@@ -8,9 +8,8 @@ The API allows you to place a breach-window based on JFrame between two transact
 in Java code in order to have to solve it before the code is executed further.
 This is done using intercepted "BreachEvents", which will be explained again later.
 ## Project is W.I.P
-This project has no mature reliability yet. The goal of it is to create an open-source fan-made breach-protocol that can
-be used in any type of java-applications. Since I lack on some knowledge about git itself, there wont be a maven dependency so far.
-However, once everything is working properly, Ill think about doing one.
+This project has no mature reliability yet. The goal of it is to create an open-source breach-protocol that can
+be used in any type of java-applications.
 
 Feel free to contribute to work together on a completely fictional & hopefully fun project.
 
@@ -18,5 +17,4 @@ Feel free to contribute to work together on a completely fictional & hopefully f
 If you're interested to hear about my approach of this project, DM me under Discord: maksykun
 
 ## Further Documentation
-If you'd like to see the progress of this api you will be most-likely able to do it through the
-documentation. The sidebar shows a slightly overview of the functionality yet.
+A detailed documentation about the API is in progress.

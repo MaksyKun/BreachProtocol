@@ -1,0 +1,53 @@
+body {
+    background: #100D14;
+    font-family: "Agency FB", sans-serif;
+    font-weight: bold;
+    color: #CBE14E;
+    display: flex;
+    justify-content: center; /* Horizontally center */
+    height: 100vh; /* Take up the full height of the viewport */
+    margin: 0;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+nav ul li:last-child {
+    margin-right: 0;
+}
+
+nav ul li:last-child {
+    margin-right: 0; /* Remove margin from the last list item */
+}
+
+/* Style the navigation links */
+nav ul li a {
+    text-decoration: none; /* Remove underline from links */
+    color: #CBE14E; /* Change link color */
+    outline: none; /* Remove the blue outline when focused */
+}
+
+/* Change link color when clicked */
+nav ul li a:active {
+    color: #727250; /* Change link color when clicked */
+}
+
+nav ul li a:hover {
+    text-decoration: none;
+    color: #727250;
+}
+
+.patch-note {
+    background-color: #444B5A;
+    clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 30%, 60% 0);
+    padding: 3px;
+    margin: 1px;
+}

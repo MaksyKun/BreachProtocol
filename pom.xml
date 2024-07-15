@@ -7,12 +7,29 @@
     <groupId>net.maksy</groupId>
     <artifactId>BreachProtocol</artifactId>
     <version>0.0.0.1</version>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.30</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.samuelcampos</groupId>
+            <artifactId>usbdrivedetector</artifactId>
+            <version>2.2.1</version>
         </dependency>
     </dependencies>
 

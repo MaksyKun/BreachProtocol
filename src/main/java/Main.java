@@ -1,20 +1,18 @@
 import breach.logic.BreachEvent;
 import breach.logic.BreachTask;
-import breach.logic.BreachDecryptor;
 import settings.SecurityProperties;
 
 public class Main {
 
     public static void main(String[] args) {
         SecurityProperties props = new SecurityProperties();
-        props.setBreachSize(7);
+        props.setBreachSize(200);
         props.setMinPuffer(3);
-        props.setMaxPuffer(8);
+        props.setMaxPuffer(5);
         setSecurityProperties(props);
 
         //DriverChecker.driverUpdates();
-
-        BreachTask breach = new BreachTask(100);
+        BreachTask breach = new BreachTask(3);
         breach.createEvent(new BreachEvent() {
             @Override
             public void onBreachPreRunning(BreachTask breach) {
@@ -40,15 +38,16 @@ public class Main {
         breach.setRunnable(() -> {
             // Code that is being executed while the breach is active / not solved
         });
-        breach.setFailedCallback(() -> {
+        breach.setSuccessCallback(() -> {
             // Code that is being executed when the breach is successfully solved
         });
-        breach.setRunnable(() -> {
+        breach.setFailedCallback(() -> {
             // Code that is being executed when the breach was failed to solve
         });
 
         breach.run();
-        BreachDecryptor.decrypt(breach);
+        //BreachDecryptor.decrypt(breach);
+        //USBWatcher.watch();
     }
 
     public static void setSecurityProperties(SecurityProperties properties) {
